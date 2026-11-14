@@ -44,3 +44,27 @@ for i in range(0, len(gold), a.bs):
     raws += texts
     preds += [parse_output(t) for t in texts]
 elapsed = time.time() - t0
+
+NONE = "__invalid__"
+
+
+def field(pred, key):
+    if pred is None:
+        return NONE
+    v = pred["aspectos"][key] if key in ASPECTS else pred[key]
+    return "" if v is None else str(v)
+
+
+res = {"model": a.name, "n": len(gold), "valid_json": sum(p is not None for p in preds) / len(gold)}
+for key in ["sentimento", *ASPECTS, "requer_acao"]:
+    y = gold[key].astype(str).str.strip().str.lower().tolist()
+    yh = [field(pr, key).lower() for pr in preds]
+    res[f"{key}_acc"] = accuracy_score(y, yh)
+    res[f"{key}_f1"] = f1_score(y, yh, average="macro", labels=sorted(set(y)), zero_division=0)
+res["aspectos_f1_medio"] = sum(res[f"{k}_f1"] for k in ASPECTS) / len(ASPECTS)
+res["ms_por_amostra"] = 1000 * elapsed / len(gold)
+
+os.makedirs("results", exist_ok=True)
+json.dump(res, open(f"results/{a.name}.json", "w"), indent=1)
+pd.DataFrame({"text": gold.text, "raw": raws}).to_csv(f"results/{a.name}_outputs.csv", index=False)
+print(json.dumps(res, indent=1))
