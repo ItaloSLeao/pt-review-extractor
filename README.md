@@ -16,13 +16,13 @@ pip install -q vllm && python src/label.py
 
 # revisar data/test_review.csv → salvar data/test_gold.csv
 
-python src/train.py --model Qwen/Qwen2.5-0.5B-Instruct --out runs/qwen0.5b
-python src/train.py --model Qwen/Qwen2.5-1.5B-Instruct --out runs/qwen1.5b
+CUDA_VISIBLE_DEVICES=0 python src/train.py --model Qwen/Qwen2.5-0.5B-Instruct --out runs/qwen0.5b
+CUDA_VISIBLE_DEVICES=0 python src/train.py --model Qwen/Qwen2.5-1.5B-Instruct --out runs/qwen1.5b
 
-python src/evaluate.py --model Qwen/Qwen2.5-0.5B-Instruct --name base-0.5b
-python src/evaluate.py --model Qwen/Qwen2.5-1.5B-Instruct --name base-1.5b
-python src/evaluate.py --model Qwen/Qwen2.5-0.5B-Instruct --adapter runs/qwen0.5b --name ft-0.5b
-python src/evaluate.py --model Qwen/Qwen2.5-1.5B-Instruct --adapter runs/qwen1.5b --name ft-1.5b
+CUDA_VISIBLE_DEVICES=0 python src/evaluate.py --model Qwen/Qwen2.5-0.5B-Instruct --name base-0.5b
+CUDA_VISIBLE_DEVICES=0 python src/evaluate.py --model Qwen/Qwen2.5-1.5B-Instruct --name base-1.5b
+CUDA_VISIBLE_DEVICES=0 python src/evaluate.py --model Qwen/Qwen2.5-0.5B-Instruct --adapter runs/qwen0.5b --name ft-0.5b
+CUDA_VISIBLE_DEVICES=0 python src/evaluate.py --model Qwen/Qwen2.5-1.5B-Instruct --adapter runs/qwen1.5b --name ft-1.5b
 ```
 
 Referência superior: avaliar o próprio professor (7B) no teste revisado mostra quanto o aluno recupera.

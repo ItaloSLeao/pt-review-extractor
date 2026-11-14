@@ -38,7 +38,7 @@ model = AutoModelForCausalLM.from_pretrained(
     quantization_config=BitsAndBytesConfig(
         load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16, bnb_4bit_use_double_quant=True
     ),
-    torch_dtype=torch.float16,
+    dtype=torch.float16,
     device_map={"": 0},
 )
 
@@ -49,7 +49,7 @@ cfg = SFTConfig(
     gradient_accumulation_steps=4,
     learning_rate=a.lr,
     lr_scheduler_type="cosine",
-    warmup_ratio=0.05,
+    warmup_steps=30,
     fp16=True,
     gradient_checkpointing=True,
     max_length=768,
@@ -68,6 +68,11 @@ trainer = SFTTrainer(
     processing_class=tok,
     peft_config=LoraConfig(r=a.r, lora_alpha=2 * a.r, lora_dropout=0.05, target_modules="all-linear", task_type="CAUSAL_LM"),
 )
+# Com fp16, parâmetros treináveis (LoRA) precisam estar em fp32 para o GradScaler.
+for param in trainer.model.parameters():
+    if param.requires_grad and param.dtype != torch.float32:
+        param.data = param.data.float()
+
 trainer.train()
 trainer.save_model(a.out)
 tok.save_pretrained(a.out)

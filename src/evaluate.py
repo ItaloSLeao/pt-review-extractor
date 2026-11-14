@@ -26,7 +26,7 @@ a = p.parse_args()
 
 gold = pd.read_csv(a.gold, keep_default_na=False)
 tok = AutoTokenizer.from_pretrained(a.adapter or a.model, padding_side="left")
-model = AutoModelForCausalLM.from_pretrained(a.model, torch_dtype=torch.float16, device_map={"": 0})
+model = AutoModelForCausalLM.from_pretrained(a.model, dtype=torch.float16, device_map={"": 0})
 if a.adapter:
     from peft import PeftModel
 

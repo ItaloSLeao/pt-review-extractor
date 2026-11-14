@@ -45,7 +45,7 @@ if a.repo:
     from peft import PeftModel
     from transformers import AutoModelForCausalLM, AutoTokenizer
 
-    model = AutoModelForCausalLM.from_pretrained(a.base, torch_dtype=torch.float16)
+    model = AutoModelForCausalLM.from_pretrained(a.base, dtype=torch.float16)
     model = PeftModel.from_pretrained(model, a.adapter).merge_and_unload()
     model.push_to_hub(a.repo)
     AutoTokenizer.from_pretrained(a.adapter).push_to_hub(a.repo)
