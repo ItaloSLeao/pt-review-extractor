@@ -30,3 +30,33 @@ def to_ds(split):
             for r in rows
         ]
     )
+
+
+tok = AutoTokenizer.from_pretrained(a.model)
+model = AutoModelForCausalLM.from_pretrained(
+    a.model,
+    quantization_config=BitsAndBytesConfig(
+        load_in_4bit=True, bnb_4bit_quant_type="nf4", bnb_4bit_compute_dtype=torch.float16, bnb_4bit_use_double_quant=True
+    ),
+    torch_dtype=torch.float16,
+    device_map={"": 0},
+)
+
+cfg = SFTConfig(
+    output_dir=a.out,
+    num_train_epochs=a.epochs,
+    per_device_train_batch_size=4,
+    gradient_accumulation_steps=4,
+    learning_rate=a.lr,
+    lr_scheduler_type="cosine",
+    warmup_ratio=0.05,
+    fp16=True,
+    gradient_checkpointing=True,
+    max_length=768,
+    logging_steps=10,
+    eval_strategy="steps",
+    eval_steps=50,
+    save_strategy="no",
+    report_to="none",
+    seed=42,
+)
