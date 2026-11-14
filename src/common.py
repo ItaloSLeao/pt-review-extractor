@@ -63,3 +63,14 @@ def is_valid(obj) -> bool:
 
 def to_json(obj: dict) -> str:
     return json.dumps(obj, ensure_ascii=False)
+
+
+def read_jsonl(path):
+    with open(path, encoding="utf-8") as f:
+        return [json.loads(l) for l in f if l.strip()]
+
+
+def write_jsonl(path, rows):
+    with open(path, "w", encoding="utf-8") as f:
+        for r in rows:
+            f.write(json.dumps(r, ensure_ascii=False) + "\n")
