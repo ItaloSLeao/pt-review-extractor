@@ -28,3 +28,20 @@ for split in ["train", "val", "test"]:
             kept.append({**r, "label": label})
     write_jsonl(f"{a.data}/{split}_labeled.jsonl", kept)
     print(f"{split}: {len(kept)}/{len(rows)} rótulos válidos")
+
+# CSV plano para corrigir o teste à mão (Google Sheets/LibreOffice).
+test = read_jsonl(f"{a.data}/test_labeled.jsonl")
+flat = [
+    {
+        "id": r["id"],
+        "text": r["text"],
+        "sentimento": r["label"]["sentimento"],
+        **{a_: r["label"]["aspectos"][a_] or "" for a_ in ASPECTS},
+        "problema_principal": r["label"]["problema_principal"] or "",
+        "requer_acao": r["label"]["requer_acao"],
+        "revisado": "",
+    }
+    for r in test
+]
+pd.DataFrame(flat).to_csv(f"{a.data}/test_review.csv", index=False)
+print("Revise data/test_review.csv e salve como data/test_gold.csv")
