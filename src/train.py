@@ -60,3 +60,19 @@ cfg = SFTConfig(
     report_to="none",
     seed=42,
 )
+trainer = SFTTrainer(
+    model=model,
+    args=cfg,
+    train_dataset=to_ds("train"),
+    eval_dataset=to_ds("val"),
+    processing_class=tok,
+    peft_config=LoraConfig(r=a.r, lora_alpha=2 * a.r, lora_dropout=0.05, target_modules="all-linear", task_type="CAUSAL_LM"),
+)
+trainer.train()
+trainer.save_model(a.out)
+tok.save_pretrained(a.out)
+
+import json
+
+with open(f"{a.out}/log_history.json", "w") as f:
+    json.dump(trainer.state.log_history, f, indent=1)
